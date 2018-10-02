@@ -134,20 +134,21 @@ class GeoIPLocation
      */
     private function getMappedLocation(ResponseInterface $response): Location
     {
-        $data = \json_decode($response->getBody());
+        $data =  \json_decode($response->getBody());
 
+//        \var_dump(\gettype($data));exit;
         return (new Location())
-            ->setStatus($this->getStatus($data->status))
-            ->setMessage($data->message)
-            ->setCity($data->city)
-            ->setCountry($data->country)
-            ->setCountryCode($data->countryCode)
-            ->setLatitude($data->lat)
-            ->setLongitude($data->lon)
-            ->setRegionCode($data->region)
-            ->setRegionName($data->regionName)
-            ->setTimezone($data->timezone)
-            ->setPostalCode($data->zip);
+            ->setStatus($this->getStatus($this->mapProperty($data, 'status')))
+            ->setMessage($this->mapProperty($data, 'message'))
+            ->setCity($this->mapProperty($data, 'city'))
+            ->setCountry($this->mapProperty($data, 'country'))
+            ->setCountryCode($this->mapProperty($data, 'countryCode'))
+            ->setLatitude($this->mapProperty($data, 'lat'))
+            ->setLongitude($this->mapProperty($data, 'lon'))
+            ->setRegionCode($this->mapProperty($data, 'region'))
+            ->setRegionName($this->mapProperty($data, 'regionName'))
+            ->setTimezone($this->mapProperty($data, 'timezone'))
+            ->setPostalCode($this->mapProperty($data, 'zip'));
     }
 
     /**
@@ -190,5 +191,22 @@ class GeoIPLocation
         return (new Location())
             ->setStatus(false)
             ->setMessage($message);
+    }
+
+    /**
+     * Map object property
+     *
+     * @param \stdClass $object   Object
+     * @param string $property Property
+     *
+     * @return null|string
+     */
+    private function mapProperty(\stdClass $object, string $property): ?string
+    {
+        if (isset($object->$property)) {
+            return $object->$property;
+        }
+
+        return null;
     }
 }
