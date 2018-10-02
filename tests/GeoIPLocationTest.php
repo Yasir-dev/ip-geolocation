@@ -55,4 +55,19 @@ class GeoIPLocationTest extends TestCase
         $this->assertSame('reserved range', $location->getMessage());
         $this->assertSame('127.0.0.1', $geoIp->getIpAddress());
     }
+
+    public function testResponseInvalid()
+    {
+        $stub = $this->getMockBuilder('ipGeolocation\GeoIPLocation')
+            ->setMethods(array('getIpAddress'))
+            ->getMock();
+
+        $stub->method('getIpAddress')
+        ->willReturn('foo');
+
+        $location = $stub->getGeoLocation();
+
+        $this->assertFalse($location->getStatus());
+        $this->assertSame('invalid query', $location->getMessage());
+    }
 }
