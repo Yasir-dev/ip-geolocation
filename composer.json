@@ -24,7 +24,7 @@
 
   "autoload-dev": {
     "psr-4": {
-      "ipGeolocation\\tests": "tests/"
+      "ipGeolocation\\tests\\": "tests/"
     }
   },
 
