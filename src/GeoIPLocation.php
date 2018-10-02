@@ -136,7 +136,6 @@ class GeoIPLocation
     {
         $data =  \json_decode($response->getBody());
 
-//        \var_dump(\gettype($data));exit;
         return (new Location())
             ->setStatus($this->getStatus($this->mapProperty($data, 'status')))
             ->setMessage($this->mapProperty($data, 'message'))

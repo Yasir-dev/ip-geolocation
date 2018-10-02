@@ -45,7 +45,7 @@ class GeoIPLocationTest extends TestCase
         $this->assertSame('reserved range', $location->getMessage());
     }
 
-    public function testGetGeoLocationIpFail()
+    public function testGetGeoLocationIpInvalid()
     {
         $_SERVER['REMOTE_ADDR'] = '188.11098';
         $geoIp = new GeoIPLocation();
