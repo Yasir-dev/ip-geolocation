@@ -21,6 +21,13 @@
       "ipGeolocation\\": "src"
     }
   },
+
+  "autoload-dev": {
+    "psr-4": {
+      "ipGeolocation\\tests": "tests/"
+    }
+  },
+
   "homepage": "https://github.com/Yasir-dev/IPGeoloaction",
   "authors": [
     {

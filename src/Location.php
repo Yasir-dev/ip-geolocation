@@ -9,7 +9,6 @@ namespace ipGeolocation;
  *
  * @author yasir khurshid <yasir.khurshid@gmail.com>
  */
-
 class Location
 {
     /**
@@ -130,7 +129,7 @@ class Location
      *
      * @return Location
      */
-    public function setMessage(string $message): Location
+    public function setMessage(?string $message): Location
     {
         $this->message = $message;
 
