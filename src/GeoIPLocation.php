@@ -66,8 +66,8 @@ class GeoIPLocation
     public function getIpAddress(): string
     {
         foreach ($this->remotes as $remote) {
-            if ($address = $_SERVER[$remote]) {
-                foreach (explode(',', $address) as $ipAddress) {
+            if (isset($_SERVER[$remote])) {
+                foreach (explode(',', $_SERVER[$remote]) as $ipAddress) {
                     if ($this->isIpAddressValid($ipAddress)) {
                         return $ipAddress;
                     }
