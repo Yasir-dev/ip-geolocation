@@ -97,11 +97,13 @@ class GeoIPLocation
     /**
      * Return request Url
      *
+     * Important: access modifier is public for unit testing purpose.
+     *
      * @param string $ipAddress Ip Address
      *
      * @return string
      */
-    private function getRequestUrl(string $ipAddress): string
+    public function getRequestUrl(string $ipAddress): string
     {
         return \sprintf(
             '%s/%s/%s',

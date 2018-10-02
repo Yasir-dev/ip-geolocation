@@ -56,18 +56,36 @@ class GeoIPLocationTest extends TestCase
         $this->assertSame('127.0.0.1', $geoIp->getIpAddress());
     }
 
-    public function testResponseInvalid()
+    public function testRequestInvalid()
     {
         $stub = $this->getMockBuilder('ipGeolocation\GeoIPLocation')
-            ->setMethods(array('getIpAddress'))
+            ->setMethods(array('getRequestUrl'))
             ->getMock();
 
-        $stub->method('getIpAddress')
-        ->willReturn('foo');
+        $stub->method('getRequestUrl')
+            ->with()
+            ->willReturn('http://httpbin.org/status/undefined');
+
 
         $location = $stub->getGeoLocation();
 
         $this->assertFalse($location->getStatus());
-        $this->assertSame('invalid query', $location->getMessage());
+        $this->assertSame('Client error: 400', $location->getMessage());
+    }
+
+    public function testResponseInvalid()
+    {
+        $stub = $this->getMockBuilder('ipGeolocation\GeoIPLocation')
+            ->setMethods(array('getRequestUrl'))
+            ->getMock();
+
+        $stub->method('getRequestUrl')
+            ->with()
+            ->willReturn('http://httpbin.org/status/300');
+
+        $location = $stub->getGeoLocation();
+
+        $this->assertFalse($location->getStatus());
+        $this->assertSame('Request failed with response code: 300 and response: Multiple Choices', $location->getMessage());
     }
 }
