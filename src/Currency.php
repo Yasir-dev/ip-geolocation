@@ -1,17 +1,22 @@
 <?php
 
-namespace yasir\ipgeolocation;
+namespace ipGeolocation;
 
 /**
  * This class provides information about currency based on location
  *
- * @author  Yasir Khurshid <yasirkhurshid@hotmail.com>
- * @version 1.0
+ * PHP version 7
+ *
+ * @author yasir khurshid <yasir.khurshid@gmail.com>
  */
 
 class Currency
 {
-
+    /**
+     * Country currency ISO codes
+     *
+     * @var array
+     */
     private $currenciesIso = array(
         'AD' => 'EUR',
         'AE' => 'AED',
@@ -22,7 +27,6 @@ class Currency
         'AM' => 'AMD',
         'AN' => 'ANG',
         'AO' => 'AOA',
-        'AQ' => '',
         'AR' => 'ARS',
         'AS' => 'USD',
         'AT' => 'EUR',
@@ -262,7 +266,14 @@ class Currency
         'ZW' => 'ZWL',
     );
 
-    public function getCurrencyIso($countryIso)
+    /**
+     * Return currenncy Iso code from country Iso code
+     *
+     * @param string $countryIso Country Iso Code
+     *
+     * @return string
+     */
+    public function getCurrencyIso(string $countryIso): string
     {
         if (isset($this->currenciesIso[$countryIso])) {
             return $this->currenciesIso[$countryIso];

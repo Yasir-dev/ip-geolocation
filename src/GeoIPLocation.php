@@ -1,24 +1,23 @@
 <?php
 
-namespace yasir\ipgeolocation;
+namespace ipGeolocation;
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * This class gets geo location information from ip address
  *
- * @author  Yasir Khurshid <yasirkhurshid@hotmail.com>
- * @version 1.0
+ * PHP version 7
+ *
+ * @author yasir khurshid <yasir.khurshid@gmail.com>
  */
-
 class GeoIPLocation
 {
-
-    const IP_API_BASE_URL = 'http://ip-api.com';
-
-    const RESPONSE_FORMAT = 'json';
-
-    const DEFAULT_IP = '127.0.0.1';
-
     /**
+     * Indices for getting user IP Address
+     *
      * @var array
      */
     private $remotes = array(
@@ -32,65 +31,63 @@ class GeoIPLocation
     );
 
     /**
+     * Return geo location data based on the user's Ip Address
+     *
+     * Example: ip-address => {"status": "success", "country": "COUNTRY", "countryCode": "COUNTRY CODE", "region": "REGION CODE"}
+     *
      * @return Location
      */
     public function getGeoLocation()
     {
-        $ip = $this->getIp();
-        $url = $this->getRequestUrl($ip);
+        try {
+            $response = (new Client())->get(
+                $this->getRequestUrl($this->getIpAddress()),
+                $this->getRequestOptions()
+            );
 
-        $curl = curl_init();
+            if (\in_array($response->getStatusCode(), range(200, 299))) {
 
-        // Set options
-        curl_setopt_array($curl, [
-            CURLOPT_URL => $url,
-            \CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)',
-            CURLOPT_CONNECTTIMEOUT => 20,
-            CURLOPT_TIMEOUT => 90,
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_SSL_VERIFYPEER => 0,
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_HEADER => 0,
-            CURLINFO_HEADER_OUT => 0,
-            CURLOPT_VERBOSE => 1,
-            CURLOPT_CUSTOMREQUEST, 'GET'
-        ]);
+                return $this->getMappedLocation($response);
+            }
 
+            return $this->handleError($this->getResponsePhrase($response));
 
-        $response = curl_exec($curl);
+        } catch (RequestException $e) {
 
-        $data = \json_decode($response);
-
-        return $this->getMappedLocation($data);
+            return $this->handleError($e->getMessage());
+        }
     }
 
     /**
+     * Return Ip address of the user
+     *
      * @return string
      */
-    public function getIp()
+    public function getIpAddress(): string
     {
         foreach ($this->remotes as $remote) {
             if ($address = $_SERVER[$remote]) {
-                foreach (explode(',', $address) as $ip) {
-                    if ($this->isIpValid($ip)) {
-                        return $ip;
+                foreach (explode(',', $address) as $ipAddress) {
+                    if ($this->isIpAddressValid($ipAddress)) {
+                        return $ipAddress;
                     }
                 }
             }
         }
 
-        return self::DEFAULT_IP;
+        return ApiConfig::DEFAULT_IP_ADDRESS;
     }
 
     /**
+     * Check if ip address is valid or not
      *
-     * @param $ip
+     * @param string $ipAddress Ip Address
      *
      * @return bool
      */
-    public function isIpValid($ip)
+    public function isIpAddressValid(string $ipAddress): bool
     {
-        if (\filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+        if (\filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
             return true;
         }
 
@@ -98,29 +95,50 @@ class GeoIPLocation
     }
 
     /**
-     * @param $ip
+     * Return request Url
+     *
+     * @param string $ipAddress Ip Address
      *
      * @return string
      */
-    private function getRequestUrl($ip)
+    private function getRequestUrl(string $ipAddress): string
     {
         return \sprintf(
             '%s/%s/%s',
-            self::IP_API_BASE_URL,
-            self::RESPONSE_FORMAT,
-            $ip
+            ApiConfig::IP_API_BASE_URL,
+            ApiConfig::RESPONSE_FORMAT,
+            $ipAddress
         );
     }
 
     /**
-     * @param $data
+     * Return options array for http request
+     *
+     * @return array
+     */
+    private function getRequestOptions(): array
+    {
+        return array(
+            'timeout' => ApiConfig::TIMEOUT,
+            'connect_timeout' => ApiConfig::CONNECTION_TIMEOUT,
+            'headers' => null,
+        );
+    }
+
+    /**
+     * Return mapped Location Object
+     *
+     * @param ResponseInterface $response Response
      *
      * @return Location
      */
-    private function getMappedLocation($data)
+    private function getMappedLocation(ResponseInterface $response): Location
     {
+        $data = \json_decode($response->getBody());
+
         return (new Location())
-            ->setStatus($data->status)
+            ->setStatus($this->getStatus($data->status))
+            ->setMessage($data->message)
             ->setCity($data->city)
             ->setCountry($data->country)
             ->setCountryCode($data->countryCode)
@@ -131,7 +149,46 @@ class GeoIPLocation
             ->setTimezone($data->timezone)
             ->setPostalCode($data->zip);
     }
+
+    /**
+     * Return status
+     *
+     * @param string $status Status string
+     *
+     * @return bool
+     */
+    private function getStatus(string $status): bool
+    {
+        return ('success' === $status ? true : false);
+    }
+
+    /**
+     * Return response phrase with corresponding http status code
+     *
+     * @param ResponseInterface $response Response
+     *
+     * @return string
+     */
+    private function getResponsePhrase(ResponseInterface $response): string
+    {
+        return \sprintf(
+            'Request failed with response code: %d and response: %s',
+            $response->getStatusCode(),
+            $response->getReasonPhrase()
+        );
+    }
+
+    /**
+     * Handle error
+     *
+     * @param string $message Message
+     *
+     * @return Location
+     */
+    private function handleError(string $message): Location
+    {
+        return (new Location())
+            ->setStatus(false)
+            ->setMessage($message);
+    }
 }
-
-
-
