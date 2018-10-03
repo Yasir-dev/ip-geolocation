@@ -10,7 +10,7 @@ Get geo location information based on the IP address of the user. This package u
 
 [Geo IP Api](http://ip-api.com/) allows only 150 requests per minute. If you exceed this limit you Ip will be blocked by [Geo IP Api](http://ip-api.com/)
 
-# Installation
+## Installation
 
 You can install the package using composer
 
@@ -18,7 +18,7 @@ You can install the package using composer
 composer require yasir-dev/ip-geolocation
 ```
 
-# Usage
+## Usage
 
 ```php
 // use the package
@@ -26,6 +26,9 @@ use ipGeolocation\GeoIPLocation;
 
 // get the location object
 $location = (new GeoIPLocation())->getGeoLocation();
+
+//check the status for success
+$location->getStatus();
 
 //get the required information
 $location->getCountry();
@@ -38,5 +41,25 @@ $location->getCity();
 $location->getLongitude();
 $location->getLatitude();
 
+//handling error (status fail)
+if (!$location->getStatus()) {
+    //get error message
+    $location->getMessage();
+}
 ```
+
+## Use Cases
+
+* Determine user's location.
+* Determine user's currency/language.
+* Customise your website based on user's location.
+
+## Contribution
+
+Please feel free to open new issues, pull requests, fork or spread the package
+
+## License
+
+MIT &copy; Yasir Khurshid
+
 
