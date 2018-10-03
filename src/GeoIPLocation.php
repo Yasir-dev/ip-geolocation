@@ -87,11 +87,7 @@ class GeoIPLocation
      */
     public function isIpAddressValid(string $ipAddress): bool
     {
-        if (\filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-            return true;
-        }
-
-        return false;
+        return (bool) \filter_var($ipAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
     }
 
     /**
