@@ -1,6 +1,6 @@
 # IP Geo Location
 
-[![Build Status](https://travis-ci.com/Yasir-dev/ip-geolocation.svg?branch=master)](https://travis-ci.com/Yasir-dev/ip-geolocation) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Yasir-dev/ip-geolocation/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Yasir-dev/ip-geolocation/?branch=master) [![Code Coverage](https://scrutinizer-ci.com/g/Yasir-dev/ip-geolocation/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Yasir-dev/ip-geolocation/?branch=master)
+[![Build Status](https://travis-ci.com/Yasir-dev/ip-geolocation.svg?branch=master)](https://travis-ci.com/Yasir-dev/ip-geolocation) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Yasir-dev/ip-geolocation/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Yasir-dev/ip-geolocation/?branch=master) [![Code Coverage](https://scrutinizer-ci.com/g/Yasir-dev/ip-geolocation/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Yasir-dev/ip-geolocation/?branch=master) [![Latest Stable Version](https://poser.pugx.org/yasir-dev/ip-geolocation/v/stable)](https://packagist.org/packages/yasir-dev/ip-geolocation)
 
 Get geo location information based on the IP address of the user. This package uses [Geo IP Api](http://ip-api.com/) to get geo information. Both IPv4 and IPv6 are supported.
 
