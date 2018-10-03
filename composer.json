@@ -1,16 +1,23 @@
 {
   "name": "yasir-dev/ip-geolocation",
   "description": "Get geo location information from IP address",
-  "type": "project",
+  "type": "library",
   "keywords": [
     "geoip",
     "location",
     "geolocation",
     "ipgeolocation"
   ],
+  "authors": [
+    {
+      "name": "Yasir Khurshid",
+      "email": "yasir.khurshid@gmail.com"
+    }
+  ],
+  "homepage": "https://github.com/Yasir-dev/IPGeoloaction",
   "license": "MIT",
   "require": {
-    "php": ">=5.3",
+    "php": ">=7.1",
     "guzzlehttp/guzzle": "6.0"
   },
   "require-dev": {
@@ -21,18 +28,9 @@
       "ipGeolocation\\": "src"
     }
   },
-
   "autoload-dev": {
     "psr-4": {
       "ipGeolocation\\tests\\": "tests/"
     }
-  },
-
-  "homepage": "https://github.com/Yasir-dev/IPGeoloaction",
-  "authors": [
-    {
-      "name": "Yasir Khurshid",
-      "email": "yasirkhurshid@gmail.com"
-    }
-  ]
+  }
 }
