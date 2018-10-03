@@ -4,6 +4,8 @@
 
 Get geo location information based on the IP address of the user. This package uses [Geo IP Api](http://ip-api.com/) to get geo information. Both IPv4 and IPv6 are supported.
 
+![Diagram](https://github.com/Yasir-dev/ip-geolocation/blob/master/geo_ip_diagram.jpg)
+
 ## Usage limits
 
 [Geo IP Api](http://ip-api.com/) allows only 150 requests per minute. If you exceed this limit you Ip will be blocked by [Geo IP Api](http://ip-api.com/)
