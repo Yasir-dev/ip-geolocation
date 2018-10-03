@@ -14,6 +14,9 @@ use PHPUnit\Framework\TestCase;
  */
 class GeoIPLocationTest extends TestCase
 {
+    /**
+     * Test for getGeoLocation method
+     */
     public function testGetGeoLocation()
     {
         $_SERVER['REMOTE_ADDR'] = '188.110.9.8';
@@ -34,6 +37,9 @@ class GeoIPLocationTest extends TestCase
         $this->assertSame('EUR', $location->getCurrencyIso());
     }
 
+    /**
+     * Fail test case for getGeoLocation
+     */
     public function testGetGeoLocationFail()
     {
         $_SERVER['REMOTE_ADDR'] = '';
@@ -45,6 +51,9 @@ class GeoIPLocationTest extends TestCase
         $this->assertSame('reserved range', $location->getMessage());
     }
 
+    /**
+     * Test case for invalid Ip Address
+     */
     public function testGetGeoLocationIpInvalid()
     {
         $_SERVER['REMOTE_ADDR'] = '188.11098';
@@ -56,6 +65,9 @@ class GeoIPLocationTest extends TestCase
         $this->assertSame('127.0.0.1', $geoIp->getIpAddress());
     }
 
+    /**
+     * Test case for invalid request
+     */
     public function testRequestInvalid()
     {
         $stub = $this->getMockBuilder('ipGeolocation\GeoIPLocation')
@@ -73,6 +85,9 @@ class GeoIPLocationTest extends TestCase
         $this->assertSame('Client error: 400', $location->getMessage());
     }
 
+    /**
+     * Test case for invalid response
+     */
     public function testResponseInvalid()
     {
         $stub = $this->getMockBuilder('ipGeolocation\GeoIPLocation')

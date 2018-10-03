@@ -14,6 +14,9 @@ use PHPUnit\Framework\TestCase;
  */
 class CurrencyTest extends TestCase
 {
+    /**
+     * Test for getCurrencyIso method
+     */
     public function testGetCurrencyIso()
     {
         $this->assertSame('EUR', (new Currency())->getCurrencyIso('DE'));
