@@ -17,3 +17,26 @@ You can install the package using composer
 ```
 composer require yasir-dev/ip-geolocation
 ```
+
+# Usage
+
+```php
+// use the package
+use ipGeolocation\GeoIPLocation;
+
+// get the location object
+$location = (new GeoIPLocation())->getGeoLocation();
+
+//get the required information
+$location->getCountry();
+$location->getRegionName();
+$location->getRegionCode();
+$location->getPostalCode();
+$location->getTimezone();
+$location->getCurrencyIso();
+$location->getCity();
+$location->getLongitude();
+$location->getLatitude();
+
+```
+
