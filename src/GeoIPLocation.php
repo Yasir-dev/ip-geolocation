@@ -120,8 +120,9 @@ class GeoIPLocation
         if ($this->mockHandler) {
             return new Client(array('handler' => $this->mockHandler));
         }
-
+        // @codeCoverageIgnoreStart
         return new Client();
+        // @codeCoverageIgnoreEnd
     }
 
     /**
