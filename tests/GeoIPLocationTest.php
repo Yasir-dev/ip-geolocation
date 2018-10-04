@@ -2,6 +2,10 @@
 
 namespace ipGeolocation\tests;
 
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use ipGeolocation\GeoIPLocation;
 use PHPUnit\Framework\TestCase;
 
@@ -15,18 +19,46 @@ use PHPUnit\Framework\TestCase;
 class GeoIPLocationTest extends TestCase
 {
     /**
+     * Success response
+     *
+     * @var array
+     */
+    private $responseSuccess = array (
+        'status' => 'success',
+        'country' => 'Germany',
+        'countryCode' => 'DE',
+        'region' => 'NW',
+        'regionName' => 'North Rhine-Westphalia',
+        'city' => 'Wesseling',
+        'zip' => '50389',
+        'lat' => '50.8271',
+        'lon' => '6.9747',
+        'timezone' => 'Europe/Berlin',
+    );
+
+    /**
+     * Fail response
+     *
+     * @var array
+     */
+    private $responseFail = array (
+        'status' => 'fail',
+        'message' => 'reserved range',
+    );
+
+    /**
      * Test for getGeoLocation method
      */
     public function testGetGeoLocation()
     {
         $_SERVER['REMOTE_ADDR'] = '188.110.9.8';
-        $location = (new GeoIPLocation())->getGeoLocation();
+
+        $location = $this->getMock($this->responseSuccess)->getGeoLocation();
 
         $this->assertInstanceOf('ipGeolocation\Location', $location);
-
         $this->assertTrue($location->getStatus());
-        $this->assertSame('Wesseling', $location->getCity());
         $this->assertSame('Germany', $location->getCountry());
+        $this->assertSame('Wesseling', $location->getCity());
         $this->assertSame('DE', $location->getCountryCode());
         $this->assertSame(50.8271, $location->getLatitude());
         $this->assertSame(6.9747, $location->getLongitude());
@@ -43,9 +75,7 @@ class GeoIPLocationTest extends TestCase
     public function testGetGeoLocationFail()
     {
         $_SERVER['REMOTE_ADDR'] = '';
-        $location = (new GeoIPLocation())->getGeoLocation();
-
-        $this->assertInstanceOf('ipGeolocation\Location', $location);
+        $location = $this->getMock($this->responseFail)->getGeoLocation();
 
         $this->assertFalse($location->getStatus());
         $this->assertSame('reserved range', $location->getMessage());
@@ -57,7 +87,7 @@ class GeoIPLocationTest extends TestCase
     public function testGetGeoLocationIpInvalid()
     {
         $_SERVER['REMOTE_ADDR'] = '188.11098';
-        $geoIp = new GeoIPLocation();
+        $geoIp = $this->getMock($this->responseFail);
         $location = $geoIp->getGeoLocation();
 
         $this->assertFalse($location->getStatus());
@@ -70,16 +100,7 @@ class GeoIPLocationTest extends TestCase
      */
     public function testRequestInvalid()
     {
-        $stub = $this->getMockBuilder('ipGeolocation\GeoIPLocation')
-            ->setMethods(array('getRequestUrl'))
-            ->getMock();
-
-        $stub->method('getRequestUrl')
-            ->with()
-            ->willReturn('http://httpbin.org/status/undefined');
-
-
-        $location = $stub->getGeoLocation();
+        $location = $this->getMockRequestException()->getGeoLocation();
 
         $this->assertFalse($location->getStatus());
         $this->assertSame('Client error: 400', $location->getMessage());
@@ -90,17 +111,41 @@ class GeoIPLocationTest extends TestCase
      */
     public function testResponseInvalid()
     {
-        $stub = $this->getMockBuilder('ipGeolocation\GeoIPLocation')
-            ->setMethods(array('getRequestUrl'))
-            ->getMock();
-
-        $stub->method('getRequestUrl')
-            ->with()
-            ->willReturn('http://httpbin.org/status/300');
-
-        $location = $stub->getGeoLocation();
+        $location = $this->getMock(array(), 500)->getGeoLocation();
 
         $this->assertFalse($location->getStatus());
-        $this->assertSame('Request failed with response code: 300 and response: Multiple Choices', $location->getMessage());
+        $this->assertSame('Request failed with response code: 500 and response: Internal Server Error', $location->getMessage());
+    }
+
+    /**
+     * Get mocked object to avoid live api requests
+     *
+     * @param array $response Response
+     * @param int $statusCode       Http status code
+     *
+     * @return GeoIPLocation
+     */
+    private function getMock(array $response = array(), int $statusCode = 200): GeoIPLocation
+    {
+       $mock = new MockHandler(array(
+            new Response($statusCode, [], \json_encode($response), '1.1', ''),
+            new RequestException('Client error: 400', new Request('GET', 'test'))
+        ));
+
+        return (new GeoIPLocation())->setMockHandler($mock);
+    }
+
+    /**
+     * Get mock object for exception to test edge error case
+     *
+     * @return GeoIPLocation
+     */
+    private function getMockRequestException()
+    {
+        $mock = new MockHandler(array(
+            new RequestException('Client error: 400', new Request('GET', 'test'))
+        ));
+
+        return (new GeoIPLocation())->setMockHandler($mock);
     }
 }

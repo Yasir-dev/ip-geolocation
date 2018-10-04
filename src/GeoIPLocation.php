@@ -4,6 +4,7 @@ namespace ipGeolocation;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Handler\MockHandler;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -15,6 +16,25 @@ use Psr\Http\Message\ResponseInterface;
  */
 class GeoIPLocation
 {
+    /**
+     * @var MockHandler
+     */
+    private $mockHandler;
+
+    /**
+     * Set mock handler (Unit testing purpose)
+     *
+     * @param MockHandler $mockHandler Mock handler
+     *
+     * @return GeoIPLocation
+     */
+    public function setMockHandler(MockHandler $mockHandler): GeoIPLocation
+    {
+        $this->mockHandler = $mockHandler;
+
+        return $this;
+    }
+
     /**
      * Indices for getting user IP Address
      *
@@ -40,7 +60,7 @@ class GeoIPLocation
     public function getGeoLocation()
     {
         try {
-            $response = (new Client())->get(
+            $response = $this->getHttpClient()->get(
                 $this->getRequestUrl($this->getIpAddress()),
                 $this->getRequestOptions()
             );
@@ -91,15 +111,27 @@ class GeoIPLocation
     }
 
     /**
-     * Return request Url
+     * Return http client
      *
-     * Important: access modifier is public for unit testing purpose.
+     * @return Client
+     */
+    private function getHttpClient(): Client
+    {
+        if ($this->mockHandler) {
+            return new Client(array('handler' => $this->mockHandler));
+        }
+
+        return new Client();
+    }
+
+    /**
+     * Return request Url
      *
      * @param string $ipAddress Ip Address
      *
      * @return string
      */
-    public function getRequestUrl(string $ipAddress): string
+    private function getRequestUrl(string $ipAddress): string
     {
         return \sprintf(
             '%s/%s/%s',
